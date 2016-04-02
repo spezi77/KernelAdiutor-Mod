@@ -48,7 +48,6 @@ import com.grarak.kerneladiutor.fragments.kernel.WakeLockFragment;
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.database.CommandDB;
-import com.grarak.kerneladiutor.utils.tools.UpdateChecker;
 import com.kerneladiutor.library.root.RootUtils;
 
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class BootService extends Service {
 
     private final int id = 1;
     private NotificationManager mNotifyManager;
-    private NotificationCompat.Builder mBuilder, mUpdate;
+    private NotificationCompat.Builder mBuilder;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -196,7 +195,6 @@ public class BootService extends Service {
         su.close();
         toast(getString(R.string.apply_on_boot_finished));
         if (Utils.getBoolean("updatecheck", true, MainActivity.context)) {
-            bootCheckForAppUpdate();
         }
     }
 
@@ -212,38 +210,6 @@ public class BootService extends Service {
                     Utils.toast(getString(R.string.app_name) + ": " + message, BootService.this);
                 }
             });
-    }
-
-    private void bootCheckForAppUpdate() {
-        log("Checking for app update...");
-
-        UpdateChecker.checkForUpdate(new UpdateChecker.Callback() {
-            @Override
-            public void onSuccess(final UpdateChecker.AppUpdateData appUpdateData) {
-                log("update check onSuccess");
-
-                if (UpdateChecker.isOldVersion(appUpdateData)) {
-                    mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    mUpdate = new NotificationCompat.Builder(MainActivity.context);
-                    mUpdate.setContentTitle(getString(R.string.update_available))
-                            .setContentText(getString(R.string.update_available_open_app))
-                            .setSmallIcon(R.drawable.ic_launcher_preview);
-
-                    TaskStackBuilder updatestackBuilder = TaskStackBuilder.create(MainActivity.context);
-                    updatestackBuilder.addParentStack(MainActivity.class);
-                    updatestackBuilder.addNextIntent(new Intent(MainActivity.context, MainActivity.class));
-                    PendingIntent updatependingIntent = updatestackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-                    mUpdate.setContentIntent(updatependingIntent);
-
-                    mNotifyManager.notify(id, mUpdate.build());
-                }
-            }
-
-            @Override
-            public void onError() {
-                log("update check onSuccess");
-            }
-        } , getString(R.string.APP_UPDATE_URL));
     }
 
 }

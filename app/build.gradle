@@ -24,13 +24,11 @@ android {
         debug {
             minifyEnabled false
             signingConfig signingConfigs.debug
-            resValue "string", "APP_UPDATE_URL", "https://raw.githubusercontent.com/yoinx/kernel_adiutor/master/download/app/app-debug.json"
         }
 
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            resValue "string", "APP_UPDATE_URL", "https://raw.githubusercontent.com/yoinx/kernel_adiutor/master/download/app/app-release.json"
         }
     }
     lintOptions {
@@ -58,6 +56,4 @@ dependencies {
     compile 'io.karim:materialtabs:2.0.3'
     compile 'net.i2p.android.ext:floatingactionbutton:1.10.1'
     compile 'org.cyanogenmod:platform.sdk:1.0'
-    compile 'com.google.code.gson:gson:2.6.2'
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
 }
