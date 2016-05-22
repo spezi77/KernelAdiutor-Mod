@@ -37,12 +37,11 @@ import java.util.List;
  */
 public class Screen implements Constants {
 
-    private static String SCREEN_CALIBRATION;
-    private static String SCREEN_CALIBRATION_CTRL;
+    private static String SCREEN_CALIBRATION, SCREEN_CALIBRATION_CTRL, MIN_BRIGHTNESS;
+
+    public static String HBM_PATH;
 
     private static GammaProfiles GAMMA_PROFILES;
-
-    private static String MIN_BRIGHTNESS;
 
     public static void activateGloveMode(boolean active, Context context) {
         Control.runCommand(active ? "glove" : "normal", GLOVE_MODE, Control.CommandType.GENERIC, context);
@@ -127,6 +126,8 @@ public class Screen implements Constants {
                     return 50;
                 case MSM_BACKLIGHT_DIMMER:
                     return 100;
+                case ZE551ML_MIN_BRIGHTNESS:
+                    return 13;
             }
         }
         return 0;
@@ -492,7 +493,7 @@ public class Screen implements Constants {
     }
 
     public static void activateScreenHBM(boolean active, Context context) {
-        Control.runCommand(active ? "1" : "0", SCREEN_HBM, Control.CommandType.GENERIC, context);
+        Control.runCommand(active ? "1" : "0", HBM_PATH, Control.CommandType.GENERIC, context);
         if (Utils.getBoolean("Widget_Active", false, context)) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.hbm_widget_layout);
@@ -507,11 +508,17 @@ public class Screen implements Constants {
     }
 
     public static boolean isScreenHBMActive() {
-        return Utils.readFile(SCREEN_HBM).equals("1");
+        return Utils.readFile(HBM_PATH).equals("1");
     }
 
     public static boolean hasScreenHBM() {
-        return Utils.existFile(SCREEN_HBM);
+        for(int i = 0;i < SCREEN_HBM.length;i++) {
+            if (Utils.existFile(SCREEN_HBM[i])) {
+                HBM_PATH = SCREEN_HBM[i];
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isScreenAutoHBMActive(Context context) {

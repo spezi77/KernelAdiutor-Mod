@@ -23,7 +23,11 @@ public class HBMWidget extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        setWidgetActive(true, context.getApplicationContext());
+        if (Screen.hasScreenHBM()) {
+            setWidgetActive(true, context.getApplicationContext());
+        } else {
+            Utils.toast("Your device does not have HBM/SRE, this widget will not work. Please remove it.", context);
+        }
     }
 
     @Override
@@ -33,11 +37,9 @@ public class HBMWidget extends AppWidgetProvider {
     }
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        final int N = appWidgetIds.length;
-
+        int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
             int appWidgetId = appWidgetIds[i];
-
 
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.hbm_widget_layout);
             Intent intent = new Intent(context, HBMWidget.class);
@@ -45,14 +47,9 @@ public class HBMWidget extends AppWidgetProvider {
             int flag = PendingIntent.FLAG_UPDATE_CURRENT;
             PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, flag);
             views.setOnClickPendingIntent(R.id.imageView, pi);
+            views.setImageViewResource(R.id.imageView, R.drawable.hbm_disable_ic);
 
-            if (Screen.isScreenHBMActive()) {
-                views.setImageViewResource(R.id.imageView, R.drawable.hbm_enable_ic);
-            } else {
-                views.setImageViewResource(R.id.imageView, R.drawable.hbm_disable_ic);
-            }
-
-           appWidgetManager.updateAppWidget(appWidgetId, views);
+            appWidgetManager.updateAppWidget(appWidgetId, views);
         }
     }
 
@@ -60,11 +57,13 @@ public class HBMWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
         if (intent.getAction().equals("com.kerneladiutor.mod.action.TOGGLE_HBM")) {
-            Log.i(Constants.TAG + ": " + getClass().getSimpleName(), "Toggling High Brightness Mode via Widget");
-            if (Screen.isScreenHBMActive()) {
-                Screen.activateScreenHBM(false, context);
-            } else {
-                Screen.activateScreenHBM(true, context);
+            Log.i(Constants.TAG + ": " + getClass().getSimpleName(), "Toggling High Brightness Mode");
+            if (Screen.hasScreenHBM()) {
+                if (Screen.isScreenHBMActive()) {
+                    Screen.activateScreenHBM(false, context);
+                } else {
+                    Screen.activateScreenHBM(true, context);
+                }
             }
         }
     }
@@ -72,4 +71,5 @@ public class HBMWidget extends AppWidgetProvider {
     private void setWidgetActive(boolean active, Context context){
         Utils.saveBoolean("Widget_Active", active, context);
     }
+
 }

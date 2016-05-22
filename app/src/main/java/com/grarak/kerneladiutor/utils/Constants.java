@@ -415,6 +415,11 @@ public interface Constants {
 
     String GPU_MIN_POWER_LEVEL = "/sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/min_pwrlevel";
 
+    String GPU_CUR_TEGRA_FREQ = "/sys/kernel/tegra_gpu/gpu_rate";
+    String GPU_MAX_TEGRA_FREQ = "/sys/kernel/tegra_gpu/gpu_cap_rate";
+    String GPU_MIN_TEGRA_FREQ = "/sys/kernel/tegra_gpu/gpu_floor_rate";
+    String GPU_AVAILABLE_TEGRA_FREQS = "/sys/kernel/tegra_gpu/gpu_available_rates";
+
     String[] GPU_2D_CUR_FREQ_ARRAY = {GPU_CUR_KGSL2D0_QCOM_FREQ};
 
     String[] GPU_2D_MAX_FREQ_ARRAY = {GPU_MAX_KGSL2D0_QCOM_FREQ};
@@ -424,16 +429,16 @@ public interface Constants {
     String[] GPU_2D_SCALING_GOVERNOR_ARRAY = {GPU_SCALING_KGSL2D0_QCOM_GOVERNOR};
 
     String[] GPU_CUR_FREQ_ARRAY = {GPU_CUR_KGSL3D0_QCOM_FREQ, GPU_CUR_FDB00000_QCOM_FREQ, GPU_CUR_FDC00000_QCOM_FREQ,
-            GPU_CUR_SOC0_FDB00000_QCOM_FREQ, GPU_CUR_1C00000_QCOM_FREQ, GPU_CUR_OMAP_FREQ, GPU_POWERVR_CURRENT_FREQ};
+            GPU_CUR_SOC0_FDB00000_QCOM_FREQ, GPU_CUR_1C00000_QCOM_FREQ, GPU_CUR_OMAP_FREQ, GPU_POWERVR_CURRENT_FREQ, GPU_CUR_TEGRA_FREQ};
 
     String[] GPU_MAX_FREQ_ARRAY = {GPU_MAX_KGSL3D0_QCOM_FREQ, GPU_MAX_FDB00000_QCOM_FREQ, GPU_MAX_FDC00000_QCOM_FREQ,
-            GPU_MAX_SOC0_FDB00000_QCOM_FREQ, GPU_MAX_1C00000_QCOM_FREQ, GPU_MAX_OMAP_FREQ, GPU_POWERVR_MAX_FREQ};
+            GPU_MAX_SOC0_FDB00000_QCOM_FREQ, GPU_MAX_1C00000_QCOM_FREQ, GPU_MAX_OMAP_FREQ, GPU_POWERVR_MAX_FREQ, GPU_MAX_TEGRA_FREQ};
 
-    String[] GPU_MIN_FREQ_ARRAY = {GPU_MIN_FDB00000_QCOM_FREQ, GPU_POWERVR_MIN_FREQ};
+    String[] GPU_MIN_FREQ_ARRAY = {GPU_MIN_FDB00000_QCOM_FREQ, GPU_POWERVR_MIN_FREQ, GPU_MIN_TEGRA_FREQ};
 
     String[] GPU_AVAILABLE_FREQS_ARRAY = {GPU_AVAILABLE_KGSL3D0_QCOM_FREQS, GPU_AVAILABLE_FDB00000_QCOM_FREQS,
             GPU_AVAILABLE_SOC0_FDB00000_QCOM_FREQS, GPU_AVAILABLE_FDC00000_QCOM_FREQS, GPU_AVAILABLE_1C00000_QCOM_FREQ,
-            GPU_AVAILABLE_OMAP_FREQS, GPU_POWERVR_AVAILABLE_FREQS};
+            GPU_AVAILABLE_OMAP_FREQS, GPU_POWERVR_AVAILABLE_FREQS, GPU_AVAILABLE_TEGRA_FREQS};
 
     String[] GPU_SCALING_GOVERNOR_ARRAY = {GPU_SCALING_KGSL3D0_QCOM_GOVERNOR, GPU_SCALING_FDB00000_QCOM_GOVERNOR,
             GPU_SCALING_PWRSCALE_GOVERNOR, GPU_SCALING_FDC00000_QCOM_GOVERNOR, GPU_SCALING_SOC0_FDB00000_QCOM_GOVERNOR,
@@ -499,7 +504,7 @@ public interface Constants {
     String[] SCREEN_RGB_CTRL_ARRAY = {SCREEN_KCAL_CTRL_ENABLE, SCREEN_KCAL_CTRL_CTRL,
             SCREEN_DIAG0_POWER_CTRL, SCREEN_COLOR_CONTROL_CTRL};
 
-    String SCREEN_HBM = "/sys/devices/virtual/graphics/fb0/hbm";
+    String SCREEN_HBM[] = {"/sys/devices/virtual/graphics/fb0/hbm", "/sys/class/graphics/fb0/sre"};
 
     // Gamma
     String K_GAMMA_R = "/sys/devices/platform/mipi_lgit.1537/kgamma_r";
@@ -544,6 +549,9 @@ public interface Constants {
     String LM3530_MIN_BRIGHTNESS = "/sys/devices/i2c-0/0-0038/lm3530_min_br";
     String LM3530_MAX_BRIGHTNESS = "/sys/devices/i2c-0/0-0038/lm3530_max_br";
 
+    String ZE551ML_MIN_BRIGHTNESS = "/sys/class/backlight/psb-bl/min_brightness";
+    String ZE551ML_MAX_BRIGHTNESS = "/sys/class/backlight/psb-bl/max_brightness";
+
     // Backlight Dimmer
     String LM3630_BACKLIGHT_DIMMER = "/sys/module/lm3630_bl/parameters/backlight_dimmer";
     String LM3630_MIN_BRIGHTNESS = "/sys/module/lm3630_bl/parameters/min_brightness";
@@ -552,7 +560,7 @@ public interface Constants {
 
     String MSM_BACKLIGHT_DIMMER = "/sys/module/msm_fb/parameters/backlight_dimmer";
 
-    String[] MIN_BRIGHTNESS_ARRAY = {LM3630_MIN_BRIGHTNESS, MSM_BACKLIGHT_DIMMER};
+    String[] MIN_BRIGHTNESS_ARRAY = {LM3630_MIN_BRIGHTNESS, MSM_BACKLIGHT_DIMMER, ZE551ML_MIN_BRIGHTNESS};
 
     String NEGATIVE_TOGGLE = "/sys/module/cypress_touchkey/parameters/mdnie_shortcut_enabled";
     String REGISTER_HOOK = "/sys/class/misc/mdnie/hook_intercept";
@@ -560,8 +568,8 @@ public interface Constants {
     String GLOVE_MODE = "/sys/devices/virtual/touchscreen/touchscreen_dev/mode";
 
     String[][] SCREEN_ARRAY = {SCREEN_RGB_ARRAY, SCREEN_RGB_CTRL_ARRAY, SCREEN_KCAL_CTRL_NEW_ARRAY, K_GAMMA_ARRAY,
-             DSI_PANEL_ARRAY, MIN_BRIGHTNESS_ARRAY,
-            {GAMMACONTROL, SCREEN_KCAL_CTRL_MIN, SCREEN_HBM, LM3530_BRIGTHNESS_MODE, LM3530_MIN_BRIGHTNESS, LM3530_MAX_BRIGHTNESS,
+             DSI_PANEL_ARRAY, MIN_BRIGHTNESS_ARRAY,SCREEN_HBM,
+            {GAMMACONTROL, SCREEN_KCAL_CTRL_MIN, LM3530_BRIGTHNESS_MODE, LM3530_MIN_BRIGHTNESS, LM3530_MAX_BRIGHTNESS,
                     LM3630_BACKLIGHT_DIMMER, LM3630_BACKLIGHT_DIMMER_THRESHOLD, LM3630_BACKLIGHT_DIMMER_OFFSET,
                     NEGATIVE_TOGGLE, REGISTER_HOOK, MASTER_SEQUENCE, GLOVE_MODE}};
 
@@ -626,6 +634,11 @@ public interface Constants {
 
     // Pocket mode for Gesture
     String POCKET_MODE = "/sys/android_touch/pocket_mode";
+    String POCKET_DETECT = "/sys/android_touch/pocket_detect";
+
+    String[] POCKET_MODE_ARRAY = {
+            POCKET_MODE, POCKET_DETECT
+    };
 
     String WAKE_TIMEOUT = "/sys/android_touch/wake_timeout";
     String WAKE_TIMEOUT_2 = "/sys/android_touch2/wake_timeout";
@@ -636,6 +649,7 @@ public interface Constants {
 
     String POWER_KEY_SUSPEND = "/sys/module/qpnp_power_on/parameters/pwrkey_suspend";
 
+//<<<<<<< HEAD
     String WAKE_VIB_STRENGTH = "/sys/android_touch/vib_strength";
     String WAKE_ST2W_TIME = "/sys/android_touch/sweep_timeout";
     String WAKE_DT2W_TIMEBETWEENTAPS = "/sys/android_touch/dt2w_time";
@@ -644,8 +658,12 @@ public interface Constants {
 
 
     String[][] WAKE_ARRAY = {DT2W_ARRAY, S2W_ARRY, T2W_ARRAY, WAKE_MISC_ARRAY, SLEEP_MISC_ARRAY,  WAKE_TIMEOUT_ARRAY, DT2S_ARRAY,
-            SLEEP_MISC_ARRAY, WAKE_MISC_ARRAY, T2W_ARRAY, {LENIENT, GESTURE_CRTL, CAMERA_GESTURE, POCKET_MODE, POWER_KEY_SUSPEND,
+            SLEEP_MISC_ARRAY, WAKE_MISC_ARRAY, T2W_ARRAY, POCKET_MODE_ARRAY, {LENIENT, GESTURE_CRTL, CAMERA_GESTURE, POCKET_MODE, POWER_KEY_SUSPEND,
             WAKE_DT2W_TIMEBETWEENTAPS, WAKE_DT2W_FEATHERX, WAKE_DT2W_FEATHERY, WAKE_VIB_STRENGTH, WAKE_ST2W_TIME, LENIENT }};
+//=======
+//    String[][] WAKE_ARRAY = {DT2W_ARRAY, S2W_ARRY, T2W_ARRAY, WAKE_MISC_ARRAY, SLEEP_MISC_ARRAY, WAKE_TIMEOUT_ARRAY,
+//            POCKET_MODE_ARRAY, {LENIENT, GESTURE_CRTL, CAMERA_GESTURE, POWER_KEY_SUSPEND}};
+//>>>>>>> d2376be68020cfdafc65ba6ac43270274f396a0c
 
     // Sound
     String SOUND_CONTROL_ENABLE = "/sys/module/snd_soc_wcd9320/parameters/enable_fs";
@@ -777,6 +795,11 @@ public interface Constants {
 
     String[] ENTROPY_ARRAY = {PROC_RANDOM};
 
+    //LED
+    String LED_SPEED_GREEN = "/sys/class/leds/green/rate";
+
+    String LED_ACTIVE = "/sys/class/leds/green/blink";
+
     // Wakelocks
     String[] SMB135X_WAKELOCKS = {
             "/sys/module/smb135x_charger/parameters/use_wlock",
@@ -815,32 +838,20 @@ public interface Constants {
     // Misc
 
     // Vibration
-    String[] VIBRATION_ARRAY = {
-            "/sys/vibrator/pwmvalue",
-            "/sys/class/timed_output/vibrator/amp",
-            "/sys/class/timed_output/vibrator/level",
-            "/sys/class/timed_output/vibrator/vtg_level",
-            "/sys/devices/platform/tspdrv/nforce_timed",
-            "/sys/class/timed_output/vibrator/pwm_value",
-            "/sys/devices/i2c-3/3-0033/vibrator/vib0/vib_duty_cycle",
-            "/sys/devices/virtual/timed_output/vibrator/voltage_level",
-            "/sys/devices/virtual/timed_output/vibrator/pwm_value_1p",
-            "/sys/devices/virtual/timed_output/vibrator/vmax_mv_strong",
-            "/sys/devices/virtual/timed_output/vibrator/vmax_mv"
-    };
-
-    int[][] VIBRATION_MAX_MIN_ARRAY = {
-            {127, 0},
-            {100, 0},
-            {31, 12},
-            {31, 12}, // Read MAX MIN from sys
-            {127, 1},
-            {100, 0}, // Read MAX MIN from sys
-            {100, 25}, // Needs enable path
-            {3199, 1200},
-            {99, 53},
-            {3596, 116}, // Needs VIB_LIGHT path
-            {3596, 116}
+    Object[][] VIBRATION_ARRAY = {
+            // {Path, Max, Min}
+            {"/sys/class/timed_output/vibrator/amp", 100, 0},
+            {"/sys/class/timed_output/vibrator/level", 31, 12},
+            {"/sys/class/timed_output/vibrator/pwm_value", 100, 0}, // Read MAX MIN from sys
+            {"/sys/class/timed_output/vibrator/pwm_value_1p", 99, 53},
+            {"/sys/class/timed_output/vibrator/voltage_level", 3199, 1200},
+            {"/sys/class/timed_output/vibrator/vtg_level", 31, 12}, // Read MAX MIN from sys
+            {"/sys/class/timed_output/vibrator/vmax_mv", 3596, 116},
+            {"/sys/class/timed_output/vibrator/vmax_mv_strong", 3596, 116}, // Needs VIB_LIGHT path
+            {"/sys/devices/platform/tspdrv/nforce_timed", 127, 1},
+            {"/sys/devices/i2c-3/3-0033/vibrator/vib0/vib_duty_cycle", 100, 25}, // Needs enable path
+            {"/sys/module/qpnp_vibrator/parameters/vib_voltage", 31, 12},
+            {"/sys/vibrator/pwmvalue", 127, 0}
     };
 
     String VIB_LIGHT = "/sys/devices/virtual/timed_output/vibrator/vmax_mv_light";
@@ -887,9 +898,13 @@ public interface Constants {
     String GETENFORCE = "getenforce";
     String SETENFORCE = "setenforce";
 
-    String[][] MISC_ARRAY = {{VIB_LIGHT, VIB_ENABLE, LOGGER_ENABLED, DYNAMIC_FSYNC, GENTLE_FAIR_SLEEPERS,
-            BCL_HOTPLUG, TCP_AVAILABLE_CONGESTIONS, HOSTNAME_KEY, ADB_OVER_WIFI, GETENFORCE, SETENFORCE},
-            LOGGER_ARRAY, VIBRATION_ARRAY, CRC_ARRAY, FSYNC_ARRAY, BCL_ARRAY};
+    Object[][] MISC_ARRAY = {
+            VIBRATION_ARRAY,
+            {VIB_LIGHT, VIB_ENABLE, SENSOR_IND_WAKELOCK, MSM_HSIC_HOST_WAKELOCK, WLAN_RX_WAKELOCK_DIVIDER,
+                    MSM_HSIC_WAKELOCK_DIVIDER, LOGGER_ENABLED, DYNAMIC_FSYNC, GENTLE_FAIR_SLEEPERS, BCL_HOTPLUG, POWER_SUSPEND_MODE,
+                    POWER_SUSPEND_STATE, TCP_AVAILABLE_CONGESTIONS, HOSTNAME_KEY, ADB_OVER_WIFI, GETENFORCE, SETENFORCE, LED_SPEED_GREEN, LED_ACTIVE },
+            LOGGER_ARRAY, SMB135X_WAKELOCKS, WLAN_RX_WAKELOCKS, WLAN_CTRL_WAKELOCKS, WLAN_WAKELOCKS, CRC_ARRAY, FSYNC_ARRAY, BCL_ARRAY};
+
 
     // Build prop
     String BUILD_PROP = "/system/build.prop";

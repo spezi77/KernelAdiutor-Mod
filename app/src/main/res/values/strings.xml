@@ -483,10 +483,14 @@
     <string name="brightness_mode">Use exponential backlight mode instead of linear mode.</string>
     <string name="min_brightness">Minimum Brightness</string>
     <string name="min_brightness_summary">Allows you to decrease the LCD screen brightness lower than it\'s possible on stock.</string>
+    <string name="led_speed">LED SPEED</string>
+    <string name="led_speed_summary">Allows you to toggle the LED speed lower than it\'s possible on stock.</string>    
     <string name="max_brightness">Maximum Brightness</string>
     <string name="max_brightness_summary">Allows you to increase the LCD screen brightness higher than it\'s possible on stock.</string>
     <string name="backlight_dimmer">Backlight Dimmer</string>
     <string name="offset">Offset</string>
+    <string name="Led_toggle">Led Toggle</string>
+    <string name="Led_toggle_summary">Test Led blink.</string>
     <string name="negative_toggle">Negative Toggle</string>
     <string name="negative_toggle_summary">Enable inverting the screen colors by quickly pressing MENU button 4 times.</string>
     <string name="mdnie_global_controls">mDNIe global controls</string>
@@ -543,7 +547,7 @@
     <string name="camera_gesture">Camera Gesture</string>
     <string name="camera_gesture_summary">Launch default camera by drawing a circle on the screen.</string>
     <string name="pocket_mode">Pocket Mode</string>
-    <string name="pocket_mode_summary">Enabling this will turn off wake controls when device in pocket.</string>
+    <string name="pocket_mode_summary">Enabling this will turn off wake controls when the device is in a pocket.</string>
     <string name="wake_timeout">Wake Timeout</string>
     <string name="wake_timeout_summary">Set a duration when the wake controls will be disabled after the screen goes off.</string>
     <string name="power_key_suspend">Power Key Suspend</string>

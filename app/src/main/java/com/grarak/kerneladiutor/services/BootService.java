@@ -48,6 +48,7 @@ import com.grarak.kerneladiutor.fragments.kernel.WakeLockFragment;
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.database.CommandDB;
+import com.grarak.kerneladiutor.utils.kernel.Screen;
 import com.kerneladiutor.library.root.RootUtils;
 
 import java.util.ArrayList;
@@ -80,7 +81,9 @@ public class BootService extends Service {
         final List<String> applys = new ArrayList<>();
         final List<String> plugins = new ArrayList<>();
 
-        getApplicationContext().startService(new Intent(getApplicationContext(), AutoHighBrightnessModeService.class));
+        if (Screen.hasScreenHBM()) {
+            getApplicationContext().startService(new Intent(getApplicationContext(), AutoHighBrightnessModeService.class));
+        }
 
         Class[] classes = {BatteryFragment.class, CPUFragment.class, CPUHotplugFragment.class,
                 CPUVoltageFragment.class, EntropyFragment.class, GPUFragment.class, IOFragment.class,
