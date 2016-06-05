@@ -19,23 +19,22 @@ package com.grarak.kerneladiutor.utils.kernel;
 import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.root.Control;
 import com.kerneladiutor.library.root.RootUtils;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.net.InetAddress;
 
 /**
  * Created by willi on 02.01.15.
  */
 public class Misc implements Constants {
+
+    private static String[] mAvailableTCPCongestions;
 
     private static String VIBRATION_PATH;
     private static Integer VIBRATION_MAX;
@@ -64,11 +63,19 @@ public class Misc implements Constants {
     }
 
     public static String getCurTcpCongestion() {
-        return getTcpAvailableCongestions().get(0);
+        return getTcpAvailableCongestions(false).get(0);
     }
 
-    public static List<String> getTcpAvailableCongestions() {
-        return new ArrayList<>(Arrays.asList(Utils.readFile(TCP_AVAILABLE_CONGESTIONS).split(" ")));
+    public static List<String> getTcpAvailableCongestions(boolean sort) {
+        if (mAvailableTCPCongestions == null) mAvailableTCPCongestions = new String[0];
+        String value = Utils.readFile(TCP_AVAILABLE_CONGESTIONS);
+        if (value != null) {
+            mAvailableTCPCongestions = value.split(" ");
+            if (sort) {
+                Arrays.sort(mAvailableTCPCongestions);
+            }
+        }
+        return new ArrayList<>(Arrays.asList(mAvailableTCPCongestions));
     }
 
     public static boolean hasLedSpeed() {
@@ -256,6 +263,9 @@ public class Misc implements Constants {
             Control.runCommand(active ? "1" : "0", LOGGER_FILE, Control.CommandType.GENERIC, context);
         }
         if (LOGGER_FILE.equals(LOGD)) {
+            // This is needed because the path changes from "start" to "stop" so it breaks the commandsaver function
+            Control.deletespecificcommand(context, active ? "stop" : "start", null);
+
             Control.runCommand("logd", active ? "start" : "stop", Control.CommandType.SHELL, context);
         }
     }
@@ -307,9 +317,9 @@ public class Misc implements Constants {
                 return VIBRATION_MIN;
             }
 
-            for (Object[] vibs : VIBRATION_ARRAY)
-                if (VIBRATION_PATH.equals(vibs[0]))
-                    VIBRATION_MIN = (int) vibs[2];
+            for (int i = 0; i < VIBRATION_ARRAY.length; i++)
+                if (VIBRATION_PATH.equals(VIBRATION_ARRAY[i]))
+                    VIBRATION_MIN = VIBRATION_MAX_MIN_ARRAY[i][1];
         }
         return VIBRATION_MIN != null ? VIBRATION_MIN : 0;
     }
@@ -328,9 +338,9 @@ public class Misc implements Constants {
                 return VIBRATION_MAX;
             }
 
-            for (Object[] vibs : VIBRATION_ARRAY)
-                if (VIBRATION_PATH.equals(vibs[0]))
-                    VIBRATION_MAX = (int) vibs[1];
+            for (int i = 0; i < VIBRATION_ARRAY.length; i++)
+                if (VIBRATION_PATH.equals(VIBRATION_ARRAY[i]))
+                    VIBRATION_MAX = VIBRATION_MAX_MIN_ARRAY[i][0];
         }
         return VIBRATION_MAX != null ? VIBRATION_MAX : 0;
     }
@@ -340,9 +350,9 @@ public class Misc implements Constants {
     }
 
     public static boolean hasVibration() {
-        for (Object[] vibs : VIBRATION_ARRAY)
-            if (Utils.existFile(vibs[0].toString())) {
-                VIBRATION_PATH = vibs[0].toString();
+        for (String vibration : VIBRATION_ARRAY)
+            if (Utils.existFile(vibration)) {
+                VIBRATION_PATH = vibration;
                 break;
             }
         return VIBRATION_PATH != null;
@@ -363,6 +373,18 @@ public class Misc implements Constants {
         if (result.equals("Enforcing")) return "Enforcing";
         else if (result.equals("Permissive")) return "Permissive";
         return "Unknown Status";
+    }
+
+    public static void activateswitchbuttons(boolean active, Context context) {
+        Control.runCommand(active ? "1" : "0", SWITCH_BUTTONS, Control.CommandType.GENERIC, context);
+    }
+
+    public static boolean isswitchbuttonsActive() {
+        return Utils.readFile(SWITCH_BUTTONS).equals("1");
+    }
+
+    public static boolean hasswitchbuttons() {
+        return Utils.existFile(SWITCH_BUTTONS);
     }
 
 }

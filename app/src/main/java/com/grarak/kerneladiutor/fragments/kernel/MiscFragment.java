@@ -32,7 +32,6 @@ import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.kernel.Misc;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -60,6 +59,8 @@ public class MiscFragment extends RecyclerViewFragment implements PopupCardView.
 
     private SwitchCardView.DSwitchCard mEnableUsbOtgCard;
 
+    private SwitchCardView.DSwitchCard mswitchbuttonsCard;
+
     @Override
     public void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
@@ -67,6 +68,7 @@ public class MiscFragment extends RecyclerViewFragment implements PopupCardView.
         selinuxInit();
         networkInit();
         if (Misc.hasVibration()) vibrationInit();
+        if (Misc.hasswitchbuttons()) switchbuttonsInit();
         if (Misc.hasLoggerEnable()) loggerInit();
         if (Misc.hasBcl()) bclInit();
         if (Misc.hasBclHotplug()) bclHotplugInit();
@@ -166,6 +168,18 @@ public class MiscFragment extends RecyclerViewFragment implements PopupCardView.
         }
     }
 
+    private void switchbuttonsInit() {
+        if (Misc.hasswitchbuttons()) {
+            mswitchbuttonsCard = new SwitchCardView.DSwitchCard();
+            mswitchbuttonsCard.setTitle(getString(R.string.switchbuttons));
+            mswitchbuttonsCard.setDescription(getString(R.string.switchbuttons_summary));
+            mswitchbuttonsCard.setChecked(Misc.isswitchbuttonsActive());
+            mswitchbuttonsCard.setOnDSwitchCardListener(this);
+
+            addView(mswitchbuttonsCard);
+        }
+    }
+
     private void gentlefairsleepersInit() {
         mGentleFairSleepersCard = new SwitchCardView.DSwitchCard();
         mGentleFairSleepersCard.setTitle(getString(R.string.gentlefairsleepers));
@@ -221,7 +235,7 @@ public class MiscFragment extends RecyclerViewFragment implements PopupCardView.
         addView(mNetworkDividerCard);
 
         try {
-            mTcpCongestionCard = new PopupCardView.DPopupCard(Misc.getTcpAvailableCongestions());
+            mTcpCongestionCard = new PopupCardView.DPopupCard(Misc.getTcpAvailableCongestions(true));
             mTcpCongestionCard.setTitle(getString(R.string.tcp));
             mTcpCongestionCard.setDescription(getString(R.string.tcp_summary));
             mTcpCongestionCard.setItem(Misc.getCurTcpCongestion());
@@ -263,7 +277,7 @@ public class MiscFragment extends RecyclerViewFragment implements PopupCardView.
     @Override
     public void onItemSelected(PopupCardView.DPopupCard dPopupCard, int position) {
         if (dPopupCard == mTcpCongestionCard)
-            Misc.setTcpCongestion(Misc.getTcpAvailableCongestions().get(position), getActivity());
+            Misc.setTcpCongestion(Misc.getTcpAvailableCongestions(true).get(position), getActivity());
     }
 
     @Override
@@ -316,6 +330,8 @@ public class MiscFragment extends RecyclerViewFragment implements PopupCardView.
 	   		Misc.activateLedMode(checked, getActivity());
         else if (dSwitchCard == mDynamicFsyncCard)
             Misc.activateDynamicFsync(checked, getActivity());
+        else if (dSwitchCard == mswitchbuttonsCard)
+            Misc.activateswitchbuttons(checked, getActivity());
         else if (dSwitchCard == mGentleFairSleepersCard)
             Misc.activateGentleFairSleepers(checked, getActivity());
         else if (dSwitchCard == mEnableUsbOtgCard)
