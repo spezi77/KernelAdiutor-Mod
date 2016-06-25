@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.grarak.kerneladiutor.MainActivity;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.database.ProfileDB;
 import com.grarak.kerneladiutor.utils.tools.Per_App;
@@ -36,7 +35,7 @@ public class PerAppMonitor extends AccessibilityService {
         intent.addCategory("android.intent.category.HOME");
         String launcher = localPackageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY).activityInfo.packageName;
 
-        if(event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+        if(event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.getPackageName() != null) {
             sPackageName = event.getPackageName().toString();
             if ((System.currentTimeMillis() - time) < 1000) {
                 if (!sPackageName.equals(launcher) || !sPackageName.equals("com.android.systemui")) {
@@ -72,8 +71,8 @@ public class PerAppMonitor extends AccessibilityService {
 
                 for (int i = 0; i < profileItems.size(); i++) {
                     if (profileItems.get(i).getID().equals(info.get(1))) {
-                        if (Utils.getBoolean("Per_App_Toast", false, MainActivity.context)) {
-                            Utils.toast("Applying Profile: " + profileItems.get(i).getName(), MainActivity.context);
+                        if (Utils.getBoolean("Per_App_Toast", false, this)) {
+                            Utils.toast("Applying Profile: " + profileItems.get(i).getName(), this);
                         }
                         Log.i("Kernel Adiutor", "Applying Profile:  " + profileItems.get(i).getName() + " for package " + windowname);
                         ProfileDB.ProfileItem profileItem = profileItems.get(i);

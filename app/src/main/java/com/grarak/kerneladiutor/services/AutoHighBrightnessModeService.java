@@ -30,9 +30,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
-import com.grarak.kerneladiutor.MainActivity;
 import com.grarak.kerneladiutor.utils.Constants;
-import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.kernel.Screen;
 
 /**
@@ -41,7 +39,7 @@ import com.grarak.kerneladiutor.utils.kernel.Screen;
 public class AutoHighBrightnessModeService extends Service {
     public static float lux = 0, avglux = 0;
     public static int LuxThresh = 3000;
-    public static boolean HBM_Widget_Toggled = false;
+    public static boolean HBM_Manually_Toggled = false;
     public static float[] luxvalues = new float [3];
 
 
@@ -56,13 +54,15 @@ public class AutoHighBrightnessModeService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        LuxThresh = Screen.getAutoHBMThresh(getApplicationContext());
+        luxvalues = new float [Screen.getAutoHBMSmoothingSamples(getApplicationContext())];
         init();
     }
 
     @Override
     public void onDestroy() {
         LuxThresh = Screen.getAutoHBMThresh(getApplicationContext());
-        float[] luxvalues = new float [Screen.getAutoHBMSmoothingSamples(getApplicationContext())];
+        luxvalues = new float [Screen.getAutoHBMSmoothingSamples(getApplicationContext())];
         super.onDestroy();
         unregisterAutoHBMReceiver(getApplicationContext());
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -74,20 +74,20 @@ public class AutoHighBrightnessModeService extends Service {
     }
 
     private void init() {
-        registerAutoHBMReceiver(getApplicationContext());
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        if (Build.VERSION.SDK_INT > 19 && pm.isInteractive()) {
-            activateLightSensorRead();
-        } else if (Build.VERSION.SDK_INT < 20 ) {
-            activateLightSensorRead();
+        if (Screen.isScreenAutoHBMActive(getApplicationContext())) {
+            registerAutoHBMReceiver(getApplicationContext());
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (Build.VERSION.SDK_INT > 19 && pm.isInteractive()) {
+                activateLightSensorRead();
+            } else if (Build.VERSION.SDK_INT < 20) {
+                activateLightSensorRead();
+            }
         }
     }
 
     public void activateLightSensorRead() {
         sMgr = (SensorManager) getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-
         light = sMgr.getDefaultSensor(Sensor.TYPE_LIGHT);
-
         sMgr.registerListener(_SensorEventListener, light, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -99,13 +99,13 @@ public class AutoHighBrightnessModeService extends Service {
         @Override
         public void onSensorChanged(SensorEvent event) {
             // Call Screen.hasScreenHBM() here in the if block to ensure that the appropriate variables are set when calling Screen.activateScreenHBM
-            if (Screen.isScreenAutoHBMSmoothingActive(MainActivity.context) && Screen.hasScreenHBM()) {
-                // This should average the last 3 lux values
+            if (Screen.isScreenAutoHBMActive(getApplicationContext()) && Screen.isScreenAutoHBMSmoothingActive(getApplicationContext()) && Screen.hasScreenHBM()) {
+                // This should average the last X lux values. X being user set or defaulting to 3.
                 // This will cause some delay in autohbm actually working as the values initialize at 0
                 avglux = 0;
-                for(int i = 1; i <= luxvalues.length-1; i++) {
+                for(int i = luxvalues.length - 1; i > 0;  i--) {
                     luxvalues[i] = luxvalues[i - 1];
-                    avglux += luxvalues[i - 1];
+                    avglux += luxvalues[i];
                 }
                 luxvalues[0] = event.values[0];
                 avglux += luxvalues[0];
@@ -113,14 +113,14 @@ public class AutoHighBrightnessModeService extends Service {
             } else {
                 lux = Math.round(event.values[0]);
             }
-            if (!HBM_Widget_Toggled) {
+            if (Screen.isScreenAutoHBMActive(getApplicationContext()) && !HBM_Manually_Toggled) {
                 if (lux >= LuxThresh && !Screen.isScreenHBMActive()) {
                     Log.i("Kernel Adiutor: ", "AutoHBMService Activating HBM: received LUX value: " + lux + " Threshold: " + LuxThresh);
-                    Screen.activateScreenHBM(true, getApplicationContext());
+                    Screen.activateScreenHBM(true, getApplicationContext(), "Auto");
                 }
                 if (lux < LuxThresh && Screen.isScreenHBMActive()) {
                     Log.i("Kernel Adiutor: ", "De-Activation: AutoHBMService: received LUX value: " + lux + " Threshold: " + LuxThresh);
-                    Screen.activateScreenHBM(false, getApplicationContext());
+                    Screen.activateScreenHBM(false, getApplicationContext(), "Auto");
                 }
             }
         }
@@ -133,34 +133,46 @@ public class AutoHighBrightnessModeService extends Service {
     private BroadcastReceiver AutoHBMreceiver = null;
 
     private void registerAutoHBMReceiver(Context context) {
-        final IntentFilter autohbmfilter = new IntentFilter();
-        /** System Defined Broadcast */
-        autohbmfilter.addAction(android.content.Intent.ACTION_SCREEN_ON);
-        autohbmfilter.addAction(android.content.Intent.ACTION_SCREEN_OFF);
+        if (Screen.isScreenAutoHBMActive(getApplicationContext())) {
+            final IntentFilter autohbmfilter = new IntentFilter();
+            /** System Defined Broadcast */
+            autohbmfilter.addAction(android.content.Intent.ACTION_SCREEN_ON);
+            autohbmfilter.addAction(android.content.Intent.ACTION_SCREEN_OFF);
 
-        AutoHBMreceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, android.content.Intent intent) {
-                String strAction = intent.getAction();
-                if (strAction.equals(android.content.Intent.ACTION_SCREEN_OFF)) {
-                    HBM_Widget_Toggled = false;
-                    if (Screen.isScreenAutoHBMActive(getApplicationContext())) {
-                        LuxThresh = Screen.getAutoHBMThresh(getApplicationContext());
-                        deactivateLightSensorRead();
+            AutoHBMreceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, android.content.Intent intent) {
+                    String strAction = intent.getAction();
+                    if (strAction.equals(android.content.Intent.ACTION_SCREEN_OFF)) {
+                        if (!Screen.isScreenHBMLockActive(context)) {
+                            HBM_Manually_Toggled = false;
+                        }
+                        if (Screen.isScreenAutoHBMActive(getApplicationContext())) {
+                            LuxThresh = Screen.getAutoHBMThresh(getApplicationContext());
+                            deactivateLightSensorRead();
+                        }
+                    }
+
+                    if (strAction.equals(android.content.Intent.ACTION_SCREEN_ON)) {
+                        if (!Screen.isScreenHBMLockActive(context)) {
+                            HBM_Manually_Toggled = false;
+                        }
+                        if (Screen.isScreenAutoHBMActive(getApplicationContext())) {
+                            LuxThresh = Screen.getAutoHBMThresh(getApplicationContext());
+                            // Delay 250ms to allow sensor to reactivate after doze.
+                            try {
+                                Thread.sleep(250);
+                            } catch (InterruptedException ex) {
+                                Thread.currentThread().interrupt();
+                            }
+                            activateLightSensorRead();
+                        }
                     }
                 }
+            };
 
-                if (strAction.equals(android.content.Intent.ACTION_SCREEN_ON)) {
-                    HBM_Widget_Toggled = false;
-                    if (Screen.isScreenAutoHBMActive(getApplicationContext())) {
-                        LuxThresh = Screen.getAutoHBMThresh(getApplicationContext());
-                        activateLightSensorRead();
-                    }
-                }
-            }
-        };
-
-        context.registerReceiver(AutoHBMreceiver, autohbmfilter);
+            context.registerReceiver(AutoHBMreceiver, autohbmfilter);
+        }
     }
 
     private void unregisterAutoHBMReceiver(Context context) {

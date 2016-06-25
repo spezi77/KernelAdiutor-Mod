@@ -85,8 +85,8 @@
   <string name="initd">Init.d</string>
   <string name="startup_commands">Startbefehle</string>
   <string name="startup_commands_list">Liste der Startbefehle:</string>
-  <string name="startup_commands_list_delete">Durch Antippen eines Befehls, wird dieser aus der Datenbank gelöscht.</string>
-  <string name="startup_commands_delete">Durch das Antippen dieser Karte, lassen sich alle gespeicherten Startbefehle löschen.</string>
+  <string name="startup_commands_list_info">Durch Antippen eines Befehls, wird dieser aus der Datenbank gelöscht.</string>
+  <string name="all_startup_commands">Durch das Antippen dieser Karte, lassen sich alle gespeicherten Startbefehle löschen.</string>
   <string name="startup_commands_delete_all">Sollen wirklich alle Startbefehle gelöscht werden?</string>
   <string name="startup_commands_delete_all_yes">Ja</string>
   <string name="startup_commands_delete_all_no">Nein</string>
@@ -231,6 +231,16 @@
   <string name="fshift">FShift</string>
   <string name="dyn_plug">Dyn_Plug</string>
   <string name="dyn_plug_summary">Ein Kernel-Ersatz für Qualcomms MPDecision. Von Stratos Karafotis entwickelt.</string>
+  <string name="auto_hotplug">ARM Auto_hotplug</string>
+  <string name="auto_hotplug_summary">Ein Kernel-Ersatz für Qualcomms MPDecision. Von Will Tisdale (Thalamus).</string>
+  <string name="enable_load_treshold">Lastabhängiger oberer Schwellenwert</string>
+  <string name="enable_load_treshold_summary">Last ab der ein extra CPU-Kern aktiviert wird.</string>
+  <string name="enable_all_load_treshold">CPU-Boost-Schwellenwert</string>
+  <string name="enable_all_load_treshold_summary">Last ab der alle CPU-Kerne aktiviert werden.</string>
+  <string name="disable_load_treshold">Lastabhängiger unterer Schwellenwert</string>
+  <string name="disable_load_treshold_summary">Last ab der ein CPU-Kern deaktiviert wird.</string>
+  <string name="sampling_periods">Minimale Abtastdauer</string>
+  <string name="sampling_periods_summary">Abtastrate in Millisekunden.</string>
   <string name="blu_plug">Blu_Plug</string>
   <string name="blu_plug_summary">Ein Kernel-Ersatz für Qualcomms MPDecision. Von Code_Blue Team entwickelt.</string>
   <string name="powersaver_mode">Energiesparmodus</string>
@@ -712,19 +722,17 @@
   <string name="wakelock">Wakelocks</string>
   <string name="wakelocks_summary">Schalter ein: Der Service kann ein Wakelock einrichten. Schalter aus: Der Service kann kein Wakelock einrichten.</string>
   <string name="smb135x_wakelock">smb135x-Wakelock</string>
-  <string name="smb135x_wakelock_summary">smb135x-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock außerhalb des Ladevorgangs zu verhindern.</string>
   <string name="bluesleep_wakelock">BlueSleep-Wakelock</string>
-  <string name="bluesleep_wakelock_summary">BlueSleep-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.</string>
+  <string name="bluesleep_wakelock_summary">BlueSleep-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.\n Aktuell: %s.</string>
   <string name="sensor_ind_wakelock">sensor_ind-Wakelock</string>
-  <string name="sensor_ind_wakelock_summary">sensor_ind-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock bei deaktiviertem Ambient Display-Modus zu verhindern.</string>
-  <string name="msm_hsic_host_wakelock">msm_hsic_host-Wakelock</string>
-  <string name="msm_hsic_host_wakelock_summary">msm_hsic_host-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.</string>
+  <string name="sensor_ind_wakelock_summary">sensor_ind-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock bei deaktiviertem Ambient Display-Modus zu verhindern.\n Aktuell: %s.</string>
+  <string name="msm_hsic_host_wakelock_summary">msm_hsic_host-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.\n Aktuell: %s.</string>
   <string name="wlan_rx_wakelock">wlan_rx-Wakelock</string>
-  <string name="wlan_rx_wakelock_summary">wlan_rx-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.</string>
+  <string name="wlan_rx_wakelock_summary">wlan_rx-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.\n Aktuell: %s.</string>
   <string name="wlan_ctrl_wakelock">wlan_ctrl-Wakelock</string>
-  <string name="wlan_ctrl_wakelock_summary">wlan_ctrl-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.</string>
+  <string name="wlan_ctrl_wakelock_summary">wlan_ctrl-Wakelock verhindern.\n Aktuell: %s.</string>
   <string name="wlan_wakelock">wlan-Wakelock</string>
-  <string name="wlan_wakelock_summary">wlan-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.</string>
+  <string name="wlan_wakelock_summary">wlan-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock zu verhindern.\n Aktuell: %s.</string>
   <string name="wlan_rx_wakelock_divider">wlan_rx-Wakelock Divider</string>
   <string name="msm_hsic_wakelock_divider">msm_hsic-Wakelock Divider</string>
   <string name="bcmdhd_wakelock_divider">BCMDHD-Wakelock Divider</string>
@@ -901,5 +909,7 @@
   
   <string name="accessibility_service_label">KA Per-App-Monitor</string>
   <string name="accessibility_service_desc">Dienst zur Überwachung, ob sich eine Vordergrund-App durch das Laden eines Per-App-Profils ändert.</string>
+  <string name="smb135x_wakelock_summary">smb135x-Wakelock ist erlaubt. Ausschalten, um dieses Wakelock außerhalb des Ladevorgangs zu verhindern.\n Aktuell: %s.</string>
+  <string name="msm_hsic_host_wakelock">msm_hsic_host-Wakelock</string>
 
 </resources>

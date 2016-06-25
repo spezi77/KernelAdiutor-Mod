@@ -18,7 +18,6 @@ package com.grarak.kerneladiutor;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -59,6 +58,7 @@ import com.grarak.kerneladiutor.fragments.kernel.BatteryFragment;
 import com.grarak.kerneladiutor.fragments.kernel.CPUFragment;
 import com.grarak.kerneladiutor.fragments.kernel.CPUHotplugFragment;
 import com.grarak.kerneladiutor.fragments.kernel.CPUVoltageFragment;
+import com.grarak.kerneladiutor.fragments.kernel.CoreControlFragment;
 import com.grarak.kerneladiutor.fragments.kernel.EntropyFragment;
 import com.grarak.kerneladiutor.fragments.kernel.GPUFragment;
 import com.grarak.kerneladiutor.fragments.kernel.IOFragment;
@@ -68,7 +68,6 @@ import com.grarak.kerneladiutor.fragments.kernel.MiscFragment;
 import com.grarak.kerneladiutor.fragments.kernel.ScreenFragment;
 import com.grarak.kerneladiutor.fragments.kernel.SoundFragment;
 import com.grarak.kerneladiutor.fragments.kernel.ThermalFragment;
-import com.grarak.kerneladiutor.fragments.kernel.CoreControlFragment;
 import com.grarak.kerneladiutor.fragments.kernel.VMFragment;
 import com.grarak.kerneladiutor.fragments.kernel.WakeFragment;
 import com.grarak.kerneladiutor.fragments.kernel.WakeLockFragment;
@@ -90,6 +89,7 @@ import com.grarak.kerneladiutor.utils.database.ProfileDB;
 import com.grarak.kerneladiutor.utils.json.Downloads;
 import com.grarak.kerneladiutor.utils.kernel.CPUHotplug;
 import com.grarak.kerneladiutor.utils.kernel.CPUVoltage;
+import com.grarak.kerneladiutor.utils.kernel.CoreControl;
 import com.grarak.kerneladiutor.utils.kernel.Entropy;
 import com.grarak.kerneladiutor.utils.kernel.GPU;
 import com.grarak.kerneladiutor.utils.kernel.KSM;
@@ -111,11 +111,6 @@ import java.util.List;
  * Created by willi on 01.12.14.
  */
 public class MainActivity extends BaseActivity implements Constants {
-
-    /**
-     * Cache the context of this activity
-     */
-    public static Context context;
 
     /**
      * Views
@@ -142,10 +137,6 @@ public class MainActivity extends BaseActivity implements Constants {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // If there is a previous activity running, kill it
-        if (context != null) ((Activity) context).finish();
-        context = this;
-
         setView();
         String password;
         if (!(password = Utils.getString("password", "", this)).isEmpty())
@@ -153,7 +144,7 @@ public class MainActivity extends BaseActivity implements Constants {
         else // Use an AsyncTask to initialize everything
             new Task().execute();
 
-        if (Screen.hasScreenHBM() && !isMyServiceRunning(AutoHighBrightnessModeService.class)) {
+        if (Utils.getBoolean("AutoHBM", false, getApplicationContext()) && Screen.hasScreenHBM() && !isMyServiceRunning(AutoHighBrightnessModeService.class)) {
             startService(new Intent(this, AutoHighBrightnessModeService.class));
         }
     }
@@ -425,8 +416,6 @@ public class MainActivity extends BaseActivity implements Constants {
                 cancel(true);
                 finish();
                 return;
-            }
-            if (Utils.getBoolean("updatecheck", true, MainActivity.context)) {
             }
             mSplashView.finish();
             setInterface();

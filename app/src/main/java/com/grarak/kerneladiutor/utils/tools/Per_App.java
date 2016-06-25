@@ -11,66 +11,48 @@ import com.grarak.kerneladiutor.utils.database.PerAppDB;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Created by joe on 2/29/16.
  */
 public class Per_App {
-    public static Map getInstalledApps (Context context) {
+    public static Map<String, String> getInstalledApps (Context context) {
         // Get a list of installed apps. Currently this is only the package name
         final PackageManager pm = context.getPackageManager();
-        //ArrayList<String> installedApps = new ArrayList<String>();
-        final Map applist = new TreeMap();
+
+        final Map<String, String> applist = new HashMap<>();
 
         final List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        // Add a "Default" Selection to set the default profile"
-        applist.put("Default","Default");
 
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                for (ApplicationInfo packageInfo : packages) {
-                    applist.put(packageInfo.loadLabel(pm), packageInfo.packageName);
-                }
-            }
-        };
-
-        t.start();
-
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        for (ApplicationInfo packageInfo : packages) {
+            applist.put(String.valueOf(packageInfo.loadLabel(pm)), packageInfo.packageName);
         }
 
         return applist;
     }
 
-    public static String[] getPackageNames (Map apps) {
-        ArrayList<String> packages = new ArrayList<String>();
-        for (int i = 0; i < apps.size(); i++) {
-            packages.add(i, apps.values().toArray()[i].toString());
-        }
-        // Convert the list to strings for displaying
-        String[] packagelist = new String[packages.size()];
-        packagelist = packages.toArray(packagelist);
-
-        return packagelist;
+    public static String[] getPackageNames (Map<String, String> apps) {
+        String[] array = apps.values().toArray(new String[apps.size()]);
+        Arrays.sort(array, String.CASE_INSENSITIVE_ORDER);
+        array = insertDefaultListing(array);
+        return  array;
     }
 
-    public static String[] getAppNames (Map apps) {
-        ArrayList<String> applist = new ArrayList<String>();
-        for (int i = 0; i < apps.size(); i++) {
-            applist.add(i, apps.keySet().toArray()[i].toString());
-        }
-        // Convert the list to strings for displaying
-        String[] app_names = new String[applist.size()];
-        app_names = applist.toArray(app_names);
+    public static String[] getAppNames (Map<String, String> apps) {
+        String[] array = apps.keySet().toArray(new String[apps.size()]);
+        Arrays.sort(array, String.CASE_INSENSITIVE_ORDER);
+        array = insertDefaultListing(array);
+        return  array;
+    }
 
-        return app_names;
+    private static String[] insertDefaultListing(String[] array){
+        String[] newArray = new String[array.length+1];
+        newArray[0] = "Default";
+        System.arraycopy(array,0,newArray,1,array.length);
+        return newArray;
     }
 
     public static void save_app (String app, String id, Context context) {
@@ -142,7 +124,7 @@ public class Per_App {
         List<AccessibilityServiceInfo> runningServices = am
                 .getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
         for (AccessibilityServiceInfo service : runningServices) {
-            if (id.equals(service.getId())) {
+            if (id != null && id.equals(service.getId())) {
                 return true;
             }
         }

@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -48,12 +49,15 @@ import com.grarak.kerneladiutor.fragments.kernel.WakeLockFragment;
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.database.CommandDB;
+import com.grarak.kerneladiutor.utils.kernel.CPUVoltage;
 import com.grarak.kerneladiutor.utils.kernel.CoreControl;
 import com.grarak.kerneladiutor.utils.kernel.Screen;
 import com.kerneladiutor.library.root.RootUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by willi on 08.03.15.
@@ -82,7 +86,10 @@ public class BootService extends Service {
         final List<String> applys = new ArrayList<>();
         final List<String> plugins = new ArrayList<>();
 
-        if (Screen.hasScreenHBM() && Utils.getBoolean("AutoHBM", false, getApplicationContext())) {
+        CPUVoltage.storeVoltageTable(getApplicationContext());
+
+
+        if (Screen.isScreenAutoHBMActive(getApplicationContext()) && Screen.hasScreenHBM()) {
             getApplicationContext().startService(new Intent(getApplicationContext(), AutoHighBrightnessModeService.class));
         }
 
@@ -198,8 +205,6 @@ public class BootService extends Service {
 
         su.close();
         toast(getString(R.string.apply_on_boot_finished));
-        if (Utils.getBoolean("updatecheck", true, MainActivity.context)) {
-        }
     }
 
     private void log(String log) {
@@ -207,7 +212,7 @@ public class BootService extends Service {
     }
 
     private void toast(final String message) {
-        if (Utils.getBoolean("applyonbootshowtoast", true, getApplicationContext()))
+        if (Utils.getBoolean("applyonbootshowtoast", true, this))
             hand.post(new Runnable() {
                 @Override
                 public void run() {
